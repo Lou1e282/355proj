@@ -2,8 +2,25 @@
 #include "network.h"
 #include <limits>
 #include "misc.h"
+#include <cctype>
 #include <fstream>
 #include <dirent.h>
+
+static string trimExtraField(string text){
+    int start = 0;
+    int end = text.size() - 1;
+
+    while (start < text.size() && isspace(text[start]))
+        start++;
+
+    while (end >= start && isspace(text[end]))
+        end--;
+
+    if (start > end)
+        return "";
+
+    return text.substr(start, end - start + 1);
+}
 
 Network::Network(){
     head = NULL;
@@ -66,7 +83,7 @@ void Network::loadDB(string filename){
     count = 0;
     people.clear();
 
-    string fname, lname, bdate, contact1, contact2, delimiter;
+    string fname, lname, bdate, contact1, contact2, line;
     while (getline(fin, fname)){
         if (fname == "")
             continue;
@@ -78,12 +95,26 @@ void Network::loadDB(string filename){
             break;
         if (!getline(fin, contact2))
             break;
-        getline(fin, delimiter);
-
+        Person* person;
         if (contact1.find("@") != string::npos)
-            push_back(new Person(fname, lname, bdate, contact1, contact2));
+            person = new Person(fname, lname, bdate, contact1, contact2);
         else
-            push_back(new Person(fname, lname, bdate, contact2, contact1));
+            person = new Person(fname, lname, bdate, contact2, contact1);
+
+        while (getline(fin, line)){
+            if (line == "--------------------")
+                break;
+
+            int colon = line.find(":");
+            if (colon != string::npos){
+                string key = trimExtraField(line.substr(0, colon));
+                string value = trimExtraField(line.substr(colon + 1));
+                if (key != "")
+                    person->add_info(key, value);
+            }
+        }
+
+        push_back(person);
     }
 }
 
@@ -96,6 +127,8 @@ void Network::saveDB(string filename){
         fout << ptr->birthdate->get_date() << endl;
         fout << ptr->email->get_contact("full") << endl;
         fout << ptr->phone->get_contact("full") << endl;
+        for (map<string, string>::iterator it = ptr->extraInfo.begin(); it != ptr->extraInfo.end(); it++)
+            fout << it->first << ": " << it->second << endl;
         if (ptr->next != NULL)
             fout << "--------------------" << endl;
         ptr = ptr->next;
@@ -341,6 +374,9 @@ void Network::showMenu(){
                              ptr->phone->get_contact() == query ||
                              ptr->phone->get_contact("") == query ||
                              codeName(ptr->f_name, ptr->l_name) == query;
+
+                for (map<string, string>::iterator it = ptr->extraInfo.begin(); !match && it != ptr->extraInfo.end(); it++)
+                    match = it->first == query || it->second == query;
 
                 if (!match && query.find("/") != string::npos){
                     Date searchDate(query);

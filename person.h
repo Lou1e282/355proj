@@ -5,6 +5,7 @@
 #include "date.h"
 #include "contact.h"
 #include "fstream"
+#include <map>
 #include <vector>
 class Person{
     friend class Network;
@@ -15,6 +16,7 @@ private:
 	Date *birthdate;
     Email *email;
     Phone *phone;
+    map<string, string> extraInfo;
     // the following to attributes are used in the linked list.
     Person* next;
     Person* prev;
@@ -25,7 +27,9 @@ public:
     ~Person();
     Person(string filename);
     Person(string f_name, string l_name, string b_date, string email, string phone);
-	void print_person();
+    void print_person();
+    void print_extra_info();
+    void add_info(string key, string value);
     void print_friends();
     void makeFriend(Person* newFriend);
 	void set_person();

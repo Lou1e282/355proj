@@ -2,7 +2,24 @@
 #include "network.h"
 #include <limits>
 #include "misc.h"
+#include <cctype>
 #include <fstream>
+
+static string trimExtraField(string text){
+    int start = 0;
+    int end = text.size() - 1;
+
+    while (start < text.size() && isspace(text[start]))
+        start++;
+
+    while (end >= start && isspace(text[end]))
+        end--;
+
+    if (start > end)
+        return "";
+
+    return text.substr(start, end - start + 1);
+}
 
 Network::Network(){
     head = NULL;
@@ -39,10 +56,62 @@ Person* Network::search(string fname, string lname){
 
 void Network::loadDB(string filename){
     // TODO: Complete this method
+    ifstream fin(filename.c_str());
+    if (!fin)
+        return;
+
+    string fname, lname, bdate, contact1, contact2, line;
+    while (getline(fin, fname)){
+        if (fname == "")
+            continue;
+        if (!getline(fin, lname))
+            break;
+        if (!getline(fin, bdate))
+            break;
+        if (!getline(fin, contact1))
+            break;
+        if (!getline(fin, contact2))
+            break;
+
+        Person* person;
+        if (contact1.find("@") != string::npos)
+            person = new Person(fname, lname, bdate, contact1, contact2);
+        else
+            person = new Person(fname, lname, bdate, contact2, contact1);
+
+        while (getline(fin, line)){
+            if (line == "--------------------")
+                break;
+
+            int colon = line.find(":");
+            if (colon != string::npos){
+                string key = trimExtraField(line.substr(0, colon));
+                string value = trimExtraField(line.substr(colon + 1));
+                if (key != "")
+                    person->add_info(key, value);
+            }
+        }
+
+        push_back(person);
+    }
 }
 
 void Network::saveDB(string filename){
     // TODO: Complete this method
+    ofstream fout(filename.c_str());
+    Person* ptr = head;
+    while (ptr != NULL){
+        fout << ptr->f_name << endl;
+        fout << ptr->l_name << endl;
+        fout << ptr->birthdate->get_date() << endl;
+        fout << ptr->email->get_contact("full") << endl;
+        fout << ptr->phone->get_contact("full") << endl;
+        for (map<string, string>::iterator it = ptr->extraInfo.begin(); it != ptr->extraInfo.end(); it++)
+            fout << it->first << ": " << it->second << endl;
+        if (ptr->next != NULL)
+            fout << "--------------------" << endl;
+        ptr = ptr->next;
+    }
 }
 
 

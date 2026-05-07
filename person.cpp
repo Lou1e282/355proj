@@ -2,7 +2,24 @@
 #include "person.h"
 #include "misc.h"
 #include <algorithm>
+#include <cctype>
 #include <sstream> 
+
+static string trim(string text){
+    int start = 0;
+    int end = text.size() - 1;
+
+    while (start < text.size() && isspace(text[start]))
+        start++;
+
+    while (end >= start && isspace(text[end]))
+        end--;
+
+    if (start > end)
+        return "";
+
+    return text.substr(start, end - start + 1);
+}
 
 static string get_contact_type(string contact){
     int start = contact.find("(");
@@ -86,6 +103,19 @@ void Person::set_person(){
     cout << "Phone number: ";
     std::getline(std::cin, temp);
     phone = new Phone(type, temp); 
+
+    while (true){
+        string key;
+        string value;
+        cout << "Extra info key (blank to stop): ";
+        std::getline(std::cin, key);
+        key = trim(key);
+        if (key == "")
+            break;
+        cout << "Extra info value: ";
+        std::getline(std::cin, value);
+        add_info(key, value);
+    }
 }
 
 
@@ -123,6 +153,20 @@ void Person::set_person(string filename){
 
     next = 0;
     prev = 0;
+
+    string line;
+    while (std::getline(fin, line)){
+        if (line == "--------------------")
+            break;
+
+        int colon = line.find(":");
+        if (colon != string::npos){
+            string key = trim(line.substr(0, colon));
+            string value = trim(line.substr(colon + 1));
+            if (key != "")
+                add_info(key, value);
+        }
+    }
 }
 
 
@@ -140,10 +184,20 @@ bool Person::operator!=(const Person& rhs){
 void Person::print_person(){
     // Already implemented for you! Do not change!
 	cout << l_name <<", " << f_name << endl;
-	birthdate->print_date("Month D, YYYY");
+    birthdate->print_date("Month D, YYYY");
     phone->print();
     email->print();
+    print_extra_info();
     print_friends();
+}
+
+void Person::print_extra_info(){
+    for (map<string, string>::iterator it = extraInfo.begin(); it != extraInfo.end(); it++)
+        cout << it->first << ": " << it->second << endl;
+}
+
+void Person::add_info(string key, string value){
+    extraInfo[key] = value;
 }
 
 void Person::makeFriend(Person* newFriend){

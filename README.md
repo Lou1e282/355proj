@@ -1,7 +1,7 @@
 EE355 final project
 
 Louie Shen  louieshe@usc.edu
-Mina Karim mkarim@usc.edu
+Mina Karim  mkarim@usc.edu
 
 Phase 1:
 
@@ -45,4 +45,36 @@ Add menu option 7 ("Wise Search") to search by any stored field — phone number
 Phase 3:
 
 Implemented and maintained a vector storing people to speed up the search. 
+
+Phase 3 Extra Credit:
+
+We enlarged the database so Person now includes additional user information as key-value pairs using a map. Required fields unchanged but each entry now can include extra line before the separator, such as:
+
+college: USC
+major: Prompt Engineering
+state: IDLE
+
+When loading a database, the program reads these extra key-value lines until it
+reaches "--------------------" and stores them in the Person object. When saving
+or printing the database, the extra information is written back out with the
+normal person information. Wise Search can also match these extra keys or values.
+
+Time complexity: C++ map operations such as inserting or looking up one extra
+field take O(log m), where m is the number of extra fields stored for one person.
+The current Wise Search still scans through all n people, so searching basic
+fields is O(n). If Wise Search also checks extra information, the worst case is
+O(n * m), because it may inspect each person's extra fields.
+
+ChatGPT Report:
+
+ChatGPT was used as a coding assistant to help plan and implement the Phase 3
+extra credit feature. It suggested storing flexible extra user information with
+a map, updating the database load/save format, and documenting the time
+complexity. The final code was reviewed and adjusted to fit the existing project
+structure.
+
+
+
+
+
 
