@@ -1,7 +1,7 @@
 EE355 final project
 
 Louie Shen  louieshe@usc.edu
-Mina Kharim mkarim@usc.edu
+Mina Karim mkarim@usc.edu
 
 Phase 1:
 
