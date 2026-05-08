@@ -22,12 +22,19 @@ static string trimExtraField(string text){
     return text.substr(start, end - start + 1);
 }
 
+static string lowerText(string text){
+    for (int i = 0; i < text.size(); i++)
+        text[i] = tolower(text[i]);
+    return text;
+}
+
 Network::Network(){
     head = NULL;
     tail = NULL;
     count = 0;
 }
 
+// added vector people
 
 Network::Network(string fileName){
     head = tail = NULL, count = 0, loadDB(fileName);
@@ -362,21 +369,23 @@ void Network::showMenu(){
             cout << "Wise Search \n";
             cout << "Search: ";
             getline(cin, query);
+            query = trimExtraField(query);
+            string lowerQuery = lowerText(query);
 
             bool found = false;
             Person* ptr = head;
             while (ptr != NULL){
-                bool match = ptr->f_name == query ||
-                             ptr->l_name == query ||
+                bool match = lowerText(ptr->f_name) == lowerQuery ||
+                             lowerText(ptr->l_name) == lowerQuery ||
                              ptr->birthdate->get_date() == query ||
-                             ptr->email->get_contact() == query ||
-                             ptr->email->get_contact("") == query ||
+                             lowerText(ptr->email->get_contact()) == lowerQuery ||
+                             lowerText(ptr->email->get_contact("")) == lowerQuery ||
                              ptr->phone->get_contact() == query ||
                              ptr->phone->get_contact("") == query ||
-                             codeName(ptr->f_name, ptr->l_name) == query;
+                             lowerText(codeName(ptr->f_name, ptr->l_name)) == lowerQuery;
 
                 for (map<string, string>::iterator it = ptr->extraInfo.begin(); !match && it != ptr->extraInfo.end(); it++)
-                    match = it->first == query || it->second == query;
+                    match = lowerText(it->first) == lowerQuery || lowerText(it->second) == lowerQuery;
 
                 if (!match && query.find("/") != string::npos){
                     Date searchDate(query);

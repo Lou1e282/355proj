@@ -73,6 +73,19 @@ a map, updating the database load/save format, and documenting the time
 complexity. The final code was reviewed and adjusted to fit the existing project
 structure.
 
+Demo Instructions:
+
+1. Compile and run the project.
+2. Choose option 2 to load `networkDB.txt`.
+3. Choose option 5 or print the database to show each person's normal fields
+   plus the new extra fields such as college, major, and state.
+4. Choose option 7 for Wise Search and search for an extra value, for example
+   `USC`, `Prompt Engineering`, or `IDLE`.
+5. Choose option 3 to add a new person. After entering phone and email, enter
+   extra key-value fields when prompted, then leave the key blank to stop.
+6. Choose option 1 to save the database, then open the saved file to show that
+   the extra information was written back in the same key-value format.
+
 
 
 
